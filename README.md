@@ -35,7 +35,7 @@ try {
 } catch (AppDevKitApiException e) {
 	// Handle exception
 }
-'''
+```
 
 TODO: 
  - Finalize exception handling and response codes.
