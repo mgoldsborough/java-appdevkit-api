@@ -9,7 +9,8 @@ import junit.framework.TestCase;
 
 import com.google.gson.Gson;
 import com.mg2.adk.AppDevKit;
-import com.mg2.adk.exceptions.AppDevKitApiException;
+import com.mg2.adk.AppDevKitApiException;
+import com.mg2.adk.AppDevKitMethod;
 import com.mg2.adk.response.AndroidGetProductResponse;
 import com.mg2.adk.response.AuthGetTokenResponse;
 import com.mg2.adk.response.Product;
@@ -116,6 +117,53 @@ public class AppDevKitTest extends TestCase {
 
 	for (Product p : response.getProducts()) {
 	    System.out.println(p.toString());
+	}
+    }
+
+    /**
+     * Tests creation proper creation of an invalid request method exception.
+     */
+    public void testExceptions() {
+	try {
+	    api.rawApiCall(AppDevKitMethod.TEST_INVALID_REQUEST_METHOD);
+	} catch (AppDevKitApiException e) {
+	    assertEquals(e.getResponseCode(), 101);
+	}
+
+	try {
+	    api.rawApiCall(AppDevKitMethod.TEST_INVALID_ARGUMENTS);
+	} catch (AppDevKitApiException e) {
+	    assertEquals(e.getResponseCode(), 102);
+	}
+
+	try {
+	    api.rawApiCall(AppDevKitMethod.TEST_INVALID_AUTH_TOKEN);
+	} catch (AppDevKitApiException e) {
+	    assertEquals(e.getResponseCode(), 103);
+	}
+
+	try {
+	    api.rawApiCall(AppDevKitMethod.TEST_INVALID_APP_KEY);
+	} catch (AppDevKitApiException e) {
+	    assertEquals(e.getResponseCode(), 104);
+	}
+
+	try {
+	    api.rawApiCall(AppDevKitMethod.TEST_INVALID_API_SIGNATURE);
+	} catch (AppDevKitApiException e) {
+	    assertEquals(e.getResponseCode(), 105);
+	}
+
+	try {
+	    api.rawApiCall(AppDevKitMethod.TEST_INAPP_SIGNATURE_VERIFICATION_EXCEPTION);
+	} catch (AppDevKitApiException e) {
+	    assertEquals(e.getResponseCode(), 120);
+	}
+
+	try {
+	    api.rawApiCall(AppDevKitMethod.TEST_PRODUCT_ID_NOT_FOUND);
+	} catch (AppDevKitApiException e) {
+	    assertEquals(e.getResponseCode(), 130);
 	}
     }
 }

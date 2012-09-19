@@ -1,14 +1,23 @@
-package com.mg2.adk.exceptions;
+package com.mg2.adk;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
+ * Exception thrown by all AppDevKit API calls. The responseCode field indicates
+ * which exception occured.
  * 
  * @author MG2 Innovations LLC
- *
+ * 
  */
 public class AppDevKitApiException extends Throwable {
 
+    @SerializedName("name")
     String name;
+
+    @SerializedName("description")
     String description;
+
+    @SerializedName("response_code")
     int responseCode;
 
     public AppDevKitApiException() {
@@ -37,23 +46,7 @@ public class AppDevKitApiException extends Throwable {
 	// TODO Auto-generated constructor stub
     }
 
-    public AppDevKitApiException(String name, String description,
-	    int responseCode) {
-	super();
-	this.name = name;
-	this.description = description;
-	this.responseCode = responseCode;
-    }
-
-    public String getName() {
-	return name;
-    }
-
-    public String getDescription() {
-	return description;
-    }
-
     public int getResponseCode() {
-	return responseCode;
+	return this.responseCode;
     }
 }

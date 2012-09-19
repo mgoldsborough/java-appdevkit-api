@@ -16,7 +16,6 @@ import java.util.TreeMap;
 import org.apache.commons.codec.binary.Base64;
 
 import com.google.gson.Gson;
-import com.mg2.adk.exceptions.AppDevKitApiException;
 import com.mg2.adk.response.AndroidGetProductResponse;
 import com.mg2.adk.response.AuthGetTokenResponse;
 
@@ -89,12 +88,8 @@ public class AppDevKit {
 
 	// Perform GET
 	String response = "";
-	try {
-	    response = httpGET(AppDevKitMethods.AUTH_GET_TOKEN, urn);
-	} catch (IOException e) {
-	    System.err.println(e.getMessage());
-	    throw new AppDevKitApiException(e.getMessage(), e);
-	}
+
+	response = httpGET(AppDevKitMethod.AUTH_GET_TOKEN, urn);
 
 	// Use GSON to serialize into Auth object
 	Gson gson = new Gson();
@@ -133,8 +128,6 @@ public class AppDevKit {
 	String encInAppData = Base64.encodeBase64String(inAppData.getBytes());
 	String encInAppSig = Base64.encodeBase64String(inAppSig.getBytes());
 
-	System.out.println(encInAppSig);
-
 	map.put("auth_token", authToken);
 	map.put("inapp_data", encInAppData);
 	map.put("inapp_sig", encInAppSig);
@@ -142,12 +135,8 @@ public class AppDevKit {
 	String urn = genUrn(map);
 
 	String response = "";
-	try {
-	    response = httpGET(AppDevKitMethods.ANDROID_GET_PRODUCT, urn);
-	} catch (IOException e) {
-	    System.err.println(e.getMessage());
-	    throw new AppDevKitApiException(e.getMessage(), e);
-	}
+
+	response = httpGET(AppDevKitMethod.ANDROID_GET_PRODUCT, urn);
 
 	// Use GSON to parse into GetProduct object
 	Gson gson = new Gson();
@@ -155,6 +144,10 @@ public class AppDevKit {
 		AndroidGetProductResponse.class);
 
 	return getProduct;
+    }
+
+    public void rawApiCall(AppDevKitMethod method) throws AppDevKitApiException {
+	httpGET(method, "");
     }
 
     /**
@@ -258,8 +251,8 @@ public class AppDevKit {
      * @return The json response.
      * @throws IOException
      */
-    private String httpGET(AppDevKitMethods method, String urn)
-	    throws IOException {
+    private String httpGET(AppDevKitMethod method, String urn)
+	    throws AppDevKitApiException {
 
 	String str = "";
 	BufferedReader in = null;
@@ -281,19 +274,40 @@ public class AppDevKit {
 
 	    str = builder.toString();
 	} catch (MalformedURLException e) {
-	    System.out.println("MalformedURLException: " + urn);
+	    System.err.println("MalformedURLException: " + urn);
+	    throw new AppDevKitApiException(e.getMessage(), e);
 	} catch (IOException e) {
-	    System.out.println("IOException trying to GET: " + urn);
-	    throw e;
+	    throw new AppDevKitApiException(e.getMessage(), e);
 	} finally {
-	    if (in != null)
-		in.close();
+	    if (in != null) {
+		try {
+		    in.close();
+		} catch (IOException e) {
+		    // Ignore...
+		}
+	    }
 	}
 
 	if (debug) {
 	    System.out.println("Response: " + str);
 	}
 
+	// Check response for error
+	if (str.startsWith(("{\"exception\""))) {
+	    // API returned an API exception, serialize and throw.
+	    Gson gson = new Gson();
+	    ExceptionWrapper wrapper = gson.fromJson(str,
+		    ExceptionWrapper.class);
+	    throw wrapper.exception;
+	}
+
 	return str;
+    }
+
+    public class ExceptionWrapper {
+	public AppDevKitApiException exception;
+
+	public ExceptionWrapper() {
+	}
     }
 }

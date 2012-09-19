@@ -1,9 +1,10 @@
 package com.mg2.adk.response;
 
 /**
+ * The response from an /android/get_product request.
  * 
  * @author MG2 Innovations LLC
- *
+ * 
  */
 public class AndroidGetProductResponse {
 
@@ -19,7 +20,7 @@ public class AndroidGetProductResponse {
      */
     public AndroidGetProductResponse() {
     }
-    
+
     public Product[] getProducts() {
 	return this.products;
     }

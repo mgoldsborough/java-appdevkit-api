@@ -1,6 +1,7 @@
 package com.mg2.adk.response;
 
 /**
+ * The response from an /auth/get_token request.
  * 
  * @author MG2 Innovations LLC
  *
